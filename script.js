@@ -16,7 +16,6 @@ for (let i = 0; i < buttons.length; i++) {
 
 function changeInput(val) {
   num.value = num.value + val;
-  expOut.textContent = expOut.textContent + val;
 }
 
 function defineOperation(val) {
@@ -32,15 +31,29 @@ function defineOperation(val) {
       break;
     case 'plus':
       console.log('Сложение');
+      if(num.value[0] == '-') {
+        expOut.textContent = `${expOut.textContent}(${num.value})+`;
+      } else {
+        expOut.textContent = `${expOut.textContent}${num.value}+`;
+      }
+      num.value = '';
       break;
     case 'change':
       console.log('Смена знака');
+      if(num.value.length > 0 && num.value[0] != '-') {
+        num.value = '-' + num.value;
+      } else {
+         num.value = num.value.substring(1, num.value.length);
+      }
       break;
     case 'dot':
       console.log('Десятичная точка');
       break;
     case 'del':
       console.log('Стереть число');
+      if (num.value.length > 0) {
+        num.value = num.value.slice(0, num.value.length - 1);
+      }
       break;
     case 'equal':
       console.log('Вычислить');
