@@ -2,7 +2,18 @@ const num = document.querySelector('#number'),
   expOut = document.querySelector('.calc__expression'),
   buttons = document.querySelectorAll('.calc__button');
 let result = 0,
-  counted = false;
+  counted = false,
+  inputFocused = false;
+
+/* Определяем, есть ли фокус на поле ввода */
+num.onfocus = function () {
+  console.log('focused');
+  inputFocused = true;
+}
+num.onblur = function () {
+  console.log('blur');
+  inputFocused = false;
+}
 
 /* Прослушиваем события нажатие на кнопки калькулятора */
 for (let i = 0; i < buttons.length; i++) {
@@ -20,7 +31,7 @@ num.oninput = function () {
   num.value = num.value.replace(/[^.\d]+/g, "").replace(/^([^\.]*\.)|\./g, '$1');
 }
 
-/* Изменяем значение инпута при вводе чисел с клавиатцуры калькулятора */
+/* Изменяем значение инпута при вводе чисел с клавиатуры калькулятора */
 function changeInput(val) {
   if (counted == true) {
     num.value = '';
@@ -35,33 +46,23 @@ function defineOperation(val) {
   switch (val) {
     case 'div':
       console.log('Деление');
-      checkCounted();
       divide();
-      num.value = '';
       break;
     case 'mul':
       console.log('Умножение');
-      checkCounted();
       multiply();
-      num.value = '';
       break;
     case 'minus':
       console.log('Вычитание');
-      checkCounted();
       minus();
       break;
     case 'plus':
       console.log('Сложение');
-      checkCounted();
       plus();
       break;
     case 'change':
       console.log('Смена знака');
-      if (num.value.length > 0 && num.value[0] != '-') {
-        num.value = '-' + num.value;
-      } else {
-        num.value = num.value.substring(1, num.value.length);
-      }
+      changeSign();
       break;
     case 'dot':
       console.log('Десятичная точка');
@@ -85,40 +86,28 @@ function defineOperation(val) {
   }
 }
 
-/* Перед вводом числа проверяем, а не закончили ли мы счёт в предыдущем действии. Если закончили, то очищаем поле вывода. */
-function checkCounted() {
-  if (counted == true) {
-    expOut.textContent = '';
-    counted = false;
-  }
-}
-
 /* Функция вычисления */
 function equal() {
-  console.log('equal()');
-  if (num.value.length == 0) {
+  if (num.value.length == 0 || counted == true) {
     return
   }
-  console.log(num.value);
   if (num.value[0] == '-') {
-    console.log('-');
     expOut.textContent = `${expOut.textContent}(${num.value})`;
   } else {
-    console.log('not -');
     expOut.textContent = `${expOut.textContent}${num.value}`;
   }
   result = eval(expOut.textContent);
-  console.log(result);
+  if (result == Infinity) {
+    result = 'Бесконечность';
+  }
   num.value = result;
-  console.log(num.value);
   expOut.textContent = `${expOut.textContent}=${result}`;
-  console.log(expOut.textContent);
   counted = true;
-  console.log('counted');
 }
 
 /* Функция сложения */
 function plus() {
+  checkCounted();
   if (!checkLastSymbol()) {
     if (num.value[0] == '-') {
       expOut.textContent = `${expOut.textContent}(${num.value})+`;
@@ -131,6 +120,7 @@ function plus() {
 
 /* Функция вычитания */
 function minus() {
+  checkCounted();
   if (!checkLastSymbol()) {
     if (num.value[0] == '-') {
       expOut.textContent = `${expOut.textContent}(${num.value})-`;
@@ -143,6 +133,7 @@ function minus() {
 
 /* Функция умножения */
 function multiply() {
+  checkCounted();
   if (!checkLastSymbol()) {
     if (num.value[0] == '-') {
       expOut.textContent = `${expOut.textContent}(${num.value})*`;
@@ -155,6 +146,7 @@ function multiply() {
 
 /* Функция деления */
 function divide() {
+  checkCounted();
   if (!checkLastSymbol()) {
     if (num.value[0] == '-') {
       expOut.textContent = `${expOut.textContent}(${num.value})/`;
@@ -189,15 +181,29 @@ function dot() {
   }
 }
 
+/* Функция смены знака числа */
+function changeSign() {
+  if (num.value.length > 0 && num.value[0] != '-') {
+    num.value = '-' + num.value;
+  } else {
+    num.value = num.value.substring(1, num.value.length);
+  }
+}
+
+/* Перед вводом числа проверяем, а не закончили ли мы счёт в предыдущем действии. Если закончили, то очищаем поле вывода. */
+function checkCounted() {
+  if (counted == true) {
+    expOut.textContent = '';
+    counted = false;
+  }
+}
+
 /* Проверить, не является ли последний символ в выражении математическим знаком, иначе новый знак не добавляем */
 function checkLastSymbol() {
   let symbol = expOut.textContent[expOut.textContent.length - 1];
   console.log(symbol);
   return (num.value.length == 0 && (symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' || symbol == undefined));
 }
-
-
-
 
 /* Слушаем нажатие кнопок клавиатуры */
 document.addEventListener('keydown', function (event) {
@@ -206,7 +212,11 @@ document.addEventListener('keydown', function (event) {
   switch (event.key) {
     case 'Enter':
       console.log('Нажат Enter');
-
+      equal();
+      break;
+    case '=':
+      console.log('Нажата кнопка Равно');
+      equal();
       break;
     case '+':
       console.log('Нажат +');
@@ -232,11 +242,19 @@ document.addEventListener('keydown', function (event) {
       console.log('Нажата delete');
       del();
       break;
-    case '.':
+    case '.' || ',':
       console.log('Нажата точка');
       dot();
       break;
+    case 'Control':
+      console.log('Нажат CTRL');
+      changeSign();
+      break;
     default:
-      console.log('Нам не нужет такой код');
+      if (+event.key >= 0 && +event.key <= 9 && inputFocused == false) {
+        changeInput(event.key);
+      } else {
+        console.log('Нам не нужет такой код');
+      }
   }
 });
