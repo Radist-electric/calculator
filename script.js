@@ -39,7 +39,7 @@ function changeInput(val) {
   num.value = num.value + val;
 }
 
-/* Действия при нажатии кнопок калькулятора, которые являются не цифрами */
+/* Действия при нажатии кнопок калькулятора, которые не являются цифрами */
 function defineOperation(val) {
   switch (val) {
     case 'div':
@@ -86,7 +86,7 @@ function equal() {
     expOut.textContent = `${expOut.textContent}${num.value}`;
   }
   result = eval(expOut.textContent);
-  if (result == Infinity) {
+  if (result == Infinity || result == -Infinity) {
     result = 'Бесконечность';
   }
   num.value = result;
@@ -148,6 +148,9 @@ function divide() {
 
 /* Функция backspace */
 function backspace() {
+  if (inputFocused) {
+    return
+  }
   if (num.value.length > 0) {
     num.value = num.value.slice(0, num.value.length - 1);
   }
@@ -164,14 +167,17 @@ function dot() {
   if (!num.value.match(/\./)) {
     if (num.value.length == 0) {
       num.value = num.value + '0.';
-    } else {
+    } else if (num.value != 'Бесконечность') {
       num.value = num.value + '.';
+      counted = false;
+      expOut.textContent = '';
     }
   }
 }
 
 /* Функция смены знака числа */
 function changeSign() {
+  checkCounted();
   if (num.value.length > 0 && num.value[0] != '-') {
     num.value = '-' + num.value;
   } else {
@@ -184,6 +190,9 @@ function checkCounted() {
   if (counted == true) {
     expOut.textContent = '';
     counted = false;
+    if(num.value == 'Бесконечность') {
+      num.value = '';
+    }
   }
 }
 
