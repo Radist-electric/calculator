@@ -14,6 +14,12 @@ for (let i = 0; i < buttons.length; i++) {
     }
   });
 }
+num.oninput = function () {
+  console.log(num.value);
+  num.value = num.value.replace(/[^.\d]+/g,"").replace( /^([^\.]*\.)|\./g, '$1' );
+}
+
+
 
 function changeInput(val) {
   if (counted == true) {
@@ -76,6 +82,13 @@ function defineOperation(val) {
       break;
     case 'dot':
       console.log('Десятичная точка');
+      if (!num.value.match(/\./)) {
+        if (num.value.length == 0) {
+          num.value = num.value + '0.';
+        } else {
+          num.value = num.value + '.';
+        }
+      }
       break;
     case 'del':
       console.log('Стереть число');
