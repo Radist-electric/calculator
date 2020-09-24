@@ -51,6 +51,7 @@ input {
   border: 1px solid grey;
   border-radius: 5px;
   font-size: 14px;
+  word-break: break-all;
 }
 
 .calc__keyboard {
@@ -79,9 +80,24 @@ input {
 }
 
 .calc__button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   height: 55px;
   width: 55px;
   margin-bottom: 5px;
+  padding: 0;
+}
+
+.calc__button svg {
+  height: 30px;
+  width: 30px;
 }
 
 .calc__button_equal {
@@ -92,6 +108,7 @@ input {
   width: 100%;
   height: 40px;
   padding-left: 10px;
+  line-height: 40px;
 }
 
 #number::-webkit-input-placeholder {
