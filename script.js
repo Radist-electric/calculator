@@ -2,16 +2,16 @@ const num = document.querySelector('#number'),
   expOut = document.querySelector('.calc__expression'),
   buttons = document.querySelectorAll('.calc__button');
 let result = 0,
-  counted = false,
-  inputFocused = false;
+  counted = false;
+// inputFocused = false;
 
 /* Определяем, есть ли фокус на поле ввода */
-num.onfocus = function () {
-  inputFocused = true;
-}
-num.onblur = function () {
-  inputFocused = false;
-}
+// num.onfocus = function () {
+//   inputFocused = true;
+// }
+// num.onblur = function () {
+//   inputFocused = false;
+// }
 
 /* Прослушиваем события нажатие на кнопки калькулятора */
 for (let i = 0; i < buttons.length; i++) {
@@ -25,18 +25,23 @@ for (let i = 0; i < buttons.length; i++) {
   });
 }
 /* Прослушиваем ввод символов с клавиатуры и вырезаем всё, кроме чисел */
-num.oninput = function () {
-  num.value = num.value.replace(/[^.\d]+/g, "").replace(/^([^\.]*\.)|\./g, '$1');
-}
+// num.oninput = function () {
+//   num.textContent = num.textContent.replace(/[^.\d]+/g, "").replace(/^([^\.]*\.)|\./g, '$1');
+// }
 
 /* Изменяем значение инпута при вводе чисел с клавиатуры калькулятора */
 function changeInput(val) {
   if (counted == true) {
-    num.value = '';
+    num.textContent = '';
     expOut.textContent = '';
     counted = false;
   }
-  num.value = num.value + val;
+  if (num.textContent == '0') {
+    num.textContent = ''
+  } else if (num.textContent == '-0') {
+    num.textContent = '-'
+  }
+  num.textContent = num.textContent + val;
 }
 
 /* Действия при нажатии кнопок калькулятора, которые не являются цифрами */
@@ -58,7 +63,7 @@ function defineOperation(val) {
       changeSign();
       break;
     case 'dot':
-       dot();
+      dot();
       break;
     case 'back':
       checkCounted();
@@ -77,19 +82,20 @@ function defineOperation(val) {
 
 /* Функция вычисления */
 function equal() {
-  if (num.value.length == 0 || counted == true) {
+  if (num.textContent.length == 0 || counted == true) {
     return
   }
-  if (num.value[0] == '-') {
-    expOut.textContent = `${expOut.textContent}(${num.value})`;
+  checkInput();
+  if (num.textContent[0] == '-') {
+    expOut.textContent = `${expOut.textContent}(${num.textContent})`;
   } else {
-    expOut.textContent = `${expOut.textContent}${num.value}`;
+    expOut.textContent = `${expOut.textContent}${num.textContent}`;
   }
   result = eval(expOut.textContent);
-  if (result == Infinity || result == -Infinity) {
+  if (result == Infinity || result == -Infinity || isNaN(result)) {
     result = 'Бесконечность';
   }
-  num.value = result;
+  num.textContent = result;
   expOut.textContent = `${expOut.textContent}=${result}`;
   counted = true;
 }
@@ -97,80 +103,87 @@ function equal() {
 /* Функция сложения */
 function plus() {
   checkCounted();
+  checkInput();
   if (!checkLastSymbol()) {
-    if (num.value[0] == '-') {
-      expOut.textContent = `${expOut.textContent}(${num.value})+`;
+    if (num.textContent[0] == '-') {
+      expOut.textContent = `${expOut.textContent}(${num.textContent})+`;
     } else {
-      expOut.textContent = `${expOut.textContent}${num.value}+`;
+      expOut.textContent = `${expOut.textContent}${num.textContent}+`;
     }
   }
-  num.value = '';
+  num.textContent = '';
 }
 
 /* Функция вычитания */
 function minus() {
   checkCounted();
+  checkInput();
   if (!checkLastSymbol()) {
-    if (num.value[0] == '-') {
-      expOut.textContent = `${expOut.textContent}(${num.value})-`;
+    if (num.textContent[0] == '-') {
+      expOut.textContent = `${expOut.textContent}(${num.textContent})-`;
     } else {
-      expOut.textContent = `${expOut.textContent}${num.value}-`;
+      expOut.textContent = `${expOut.textContent}${num.textContent}-`;
     }
   }
-  num.value = '';
+  num.textContent = '';
 }
 
 /* Функция умножения */
 function multiply() {
   checkCounted();
+  checkInput();
   if (!checkLastSymbol()) {
-    if (num.value[0] == '-') {
-      expOut.textContent = `${expOut.textContent}(${num.value})*`;
+    if (num.textContent[0] == '-') {
+      expOut.textContent = `${expOut.textContent}(${num.textContent})*`;
     } else {
-      expOut.textContent = `${expOut.textContent}${num.value}*`;
+      expOut.textContent = `${expOut.textContent}${num.textContent}*`;
     }
   }
-  num.value = '';
+  num.textContent = '';
 }
 
 /* Функция деления */
 function divide() {
   checkCounted();
+  checkInput();
   if (!checkLastSymbol()) {
-    if (num.value[0] == '-') {
-      expOut.textContent = `${expOut.textContent}(${num.value})/`;
+    if (num.textContent[0] == '-') {
+      expOut.textContent = `${expOut.textContent}(${num.textContent})/`;
     } else {
-      expOut.textContent = `${expOut.textContent}${num.value}/`;
+      expOut.textContent = `${expOut.textContent}${num.textContent}/`;
     }
   }
-  num.value = '';
+  num.textContent = '';
 }
 
 /* Функция backspace */
 function backspace() {
-  if (inputFocused) {
-    return
-  }
-  if (num.value.length > 0) {
-    num.value = num.value.slice(0, num.value.length - 1);
+  // if (inputFocused) {
+  //   return
+  // }
+  if (num.textContent.length > 1) {
+    num.textContent = num.textContent.slice(0, num.textContent.length - 1);
+  } else {
+    num.textContent = '0'
   }
 }
 
 /* Функция очистки полей */
 function del() {
-  num.value = '';
+  num.textContent = '0';
   expOut.textContent = '';
 }
 
 /* Функция добавления десятичной точки */
 function dot() {
-  if (!num.value.match(/\./)) {
-    if (num.value.length == 0) {
-      num.value = num.value + '0.';
-    } else if (num.value != 'Бесконечность') {
-      num.value = num.value + '.';
+  checkCounted();
+  if (!num.textContent.match(/\./)) {
+    if (num.textContent.length == 0) {
+      num.textContent = '0.'
+    } else if (num.textContent != 'Бесконечность') {
+      num.textContent = num.textContent + '.';
       counted = false;
-      expOut.textContent = '';
+      // expOut.textContent = '';
     }
   }
 }
@@ -178,10 +191,15 @@ function dot() {
 /* Функция смены знака числа */
 function changeSign() {
   checkCounted();
-  if (num.value.length > 0 && num.value[0] != '-') {
-    num.value = '-' + num.value;
+  let len = num.textContent.length;
+  if (num.textContent == '-') {
+    num.textContent = '0'
+  } else if (num.textContent == '0') {
+    num.textContent = '-'
+  } else if (len == 0 || (len > 0 && num.textContent[0] != '-')) {
+    num.textContent = '-' + num.textContent;
   } else {
-    num.value = num.value.substring(1, num.value.length);
+    num.textContent = num.textContent.substring(1, len);
   }
 }
 
@@ -190,8 +208,8 @@ function checkCounted() {
   if (counted == true) {
     expOut.textContent = '';
     counted = false;
-    if(num.value == 'Бесконечность') {
-      num.value = '';
+    if (num.textContent == 'Бесконечность') {
+      num.textContent = '';
     }
   }
 }
@@ -199,7 +217,7 @@ function checkCounted() {
 /* Проверить, не является ли последний символ в выражении математическим знаком, иначе новый знак не добавляем */
 function checkLastSymbol() {
   let symbol = expOut.textContent[expOut.textContent.length - 1];
-  return (num.value.length == 0 && (symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' || symbol == undefined));
+  return (num.textContent.length == 0 && (symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' || symbol == undefined));
 }
 
 /* Слушаем нажатие кнопок клавиатуры */
@@ -236,10 +254,19 @@ document.addEventListener('keydown', function (event) {
       changeSign();
       break;
     default:
-      if (+event.key >= 0 && +event.key <= 9 && inputFocused == false) {
+      if (+event.key >= 0 && +event.key <= 9) {
         changeInput(event.key);
       } else {
         console.log('Нам не нужет такой код');
       }
   }
 });
+
+function checkInput() {
+  if (num.textContent == '-' || num.textContent == '-.') {
+    num.textContent = '0'
+  }
+  if (eval(num.textContent) == '0' || eval(num.textContent) == '-0') {
+    num.textContent = '0'
+  }
+}
