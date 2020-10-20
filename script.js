@@ -3,15 +3,6 @@ const num = document.querySelector('#number'),
   buttons = document.querySelectorAll('.calc__button');
 let result = 0,
   counted = false;
-// inputFocused = false;
-
-/* Определяем, есть ли фокус на поле ввода */
-// num.onfocus = function () {
-//   inputFocused = true;
-// }
-// num.onblur = function () {
-//   inputFocused = false;
-// }
 
 /* Прослушиваем события нажатие на кнопки калькулятора */
 for (let i = 0; i < buttons.length; i++) {
@@ -24,12 +15,8 @@ for (let i = 0; i < buttons.length; i++) {
     }
   });
 }
-/* Прослушиваем ввод символов с клавиатуры и вырезаем всё, кроме чисел */
-// num.oninput = function () {
-//   num.textContent = num.textContent.replace(/[^.\d]+/g, "").replace(/^([^\.]*\.)|\./g, '$1');
-// }
 
-/* Изменяем значение инпута при вводе чисел с клавиатуры калькулятора */
+/* Изменяем значение поля ввода */
 function changeInput(val) {
   if (counted == true) {
     num.textContent = '';
@@ -158,9 +145,6 @@ function divide() {
 
 /* Функция backspace */
 function backspace() {
-  // if (inputFocused) {
-  //   return
-  // }
   if (num.textContent.length > 1) {
     num.textContent = num.textContent.slice(0, num.textContent.length - 1);
   } else {
@@ -183,7 +167,6 @@ function dot() {
     } else if (num.textContent != 'Бесконечность') {
       num.textContent = num.textContent + '.';
       counted = false;
-      // expOut.textContent = '';
     }
   }
 }
@@ -266,7 +249,5 @@ function checkInput() {
   if (num.textContent == '-' || num.textContent == '-.') {
     num.textContent = '0'
   }
-  if (eval(num.textContent) == '0' || eval(num.textContent) == '-0') {
-    num.textContent = '0'
-  }
+  num.textContent = eval(num.textContent);
 }
