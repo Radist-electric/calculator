@@ -23,6 +23,9 @@ function changeInput(val) {
     expOut.textContent = '';
     counted = false;
   }
+  if (num.textContent.length >= 21) {
+    return
+  }
   if (num.textContent == '0') {
     num.textContent = ''
   } else if (num.textContent == '-0') {
@@ -161,6 +164,9 @@ function del() {
 /* Функция добавления десятичной точки */
 function dot() {
   checkCounted();
+  if (num.textContent.length >= 20) {
+    return
+  }
   if (!num.textContent.match(/\./)) {
     if (num.textContent.length == 0) {
       num.textContent = '0.'
